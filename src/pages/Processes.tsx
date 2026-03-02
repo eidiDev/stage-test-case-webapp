@@ -122,7 +122,11 @@ export default function Processes() {
 
   const flatTree = useMemo(() => {
     if (!tree) return [];
-    return flattenTree(tree);
+
+    // pega apenas os filhos do root
+    return tree.children?.flatMap((child: ProcessNode) =>
+      flattenTree(child, 0)
+    ) || [];
   }, [tree]);
 
   // ------------------- BADGES -------------------
@@ -185,21 +189,20 @@ export default function Processes() {
   });
 
   // ------------------- RENDER -------------------
-
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-[calc(100vh-120px)]">
       <h1 className="text-2xl font-bold mb-6">Processos</h1>
 
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
 
         {/* LEFT */}
-        <div className="col-span-4 crud-panel flex flex-col">
-          <div className="panel-header flex justify-between">
+        <div className="col-span-4 crud-panel flex flex-col h-full overflow-hidden">
+          <div className="panel-header flex justify-between shrink-0">
             <span>Processos</span>
             <span className="text-xs">{roots.length}</span>
           </div>
 
-          <div className="p-3 border-b">
+          <div className="p-3 border-b shrink-0">
             <div className="relative">
               <Search className="absolute left-2 top-2 w-3 h-3" />
               <Input
@@ -211,7 +214,7 @@ export default function Processes() {
             </div>
           </div>
 
-          <div className="p-2">
+          <div className="p-2 flex-1 overflow-y-auto">
             {roots
               .filter((p: any) =>
                 p.name.toLowerCase().includes(search.toLowerCase())
@@ -235,9 +238,10 @@ export default function Processes() {
         </div>
 
         {/* MID */}
-        <div className="col-span-5 crud-panel flex flex-col">
+        <div className="col-span-5 crud-panel flex flex-col h-full overflow-hidden">
 
-          <div className="panel-header flex justify-between items-center">
+          {/* HEADER FIXO */}
+          <div className="panel-header flex justify-between items-center shrink-0">
             <span>
               {tree ? `Árvore: ${tree.name}` : "Selecione um processo"}
             </span>
@@ -267,147 +271,257 @@ export default function Processes() {
             )}
           </div>
 
-          <div className="p-4 space-y-6">
-            {/* TABELA */}
+          {/* CONTEÚDO COM SCROLL ÚNICO */}
+          <div className="flex-1 overflow-y-auto px-6 py-6 space-y-10">
+
+            {/* ================= TABELA ================= */}
             {!isLoading && tree && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm border-collapse">
-                  <thead className="bg-muted/50 text-left">
-                    <tr>
-                      <th className="p-2">Nome</th>
-                      <th className="p-2">Status</th>
-                      <th className="p-2">Tipo</th>
-                      <th className="p-2">Prioridade</th>
-                      <th className="p-2 w-10"></th>
-                    </tr>
-                  </thead>
+              <div className="space-y-4">
 
-                  <tbody>
-                    {newRow && (
-                      <tr className="border-t bg-muted/30">
-                        {/* NOME */}
-                        <td className="p-2">
-                          <Input
-                            value={form.name || ""}
-                            onChange={(e) =>
-                              setForm({ ...form, name: e.target.value })
-                            }
-                            placeholder="Nome do subprocesso"
-                            className="h-8 text-sm"
-                          />
-                        </td>
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Subprocessos
+                </h3>
 
-                        {/* STATUS */}
-                        <td className="p-2">
-                          <select
-                            value={form.status}
-                            onChange={(e) =>
-                              setForm({ ...form, status: e.target.value })
-                            }
-                            className="h-8 text-xs border rounded px-2 bg-background"
-                          >
-                            <option value="ACTIVE">ACTIVE</option>
-                            <option value="IN_REVIEW">IN_REVIEW</option>
-                            <option value="CRITICAL">CRITICAL</option>
-                          </select>
-                        </td>
-
-                        {/* TIPO */}
-                        <td className="p-2">
-                          <select
-                            value={form.type}
-                            onChange={(e) =>
-                              setForm({ ...form, type: e.target.value })
-                            }
-                            className="h-8 text-xs border rounded px-2 bg-background"
-                          >
-                            <option value="MANUAL">MANUAL</option>
-                            <option value="SYSTEM">SYSTEM</option>
-                          </select>
-                        </td>
-
-                        {/* PRIORIDADE */}
-                        <td className="p-2">
-                          <select
-                            value={form.priority}
-                            onChange={(e) =>
-                              setForm({ ...form, priority: e.target.value })
-                            }
-                            className="h-8 text-xs border rounded px-2 bg-background"
-                          >
-                            <option value="LOW">LOW</option>
-                            <option value="MEDIUM">MEDIUM</option>
-                            <option value="HIGH">HIGH</option>
-                          </select>
-                        </td>
-
-                        {/* AÇÕES */}
-                        <td className="p-2 flex gap-1">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => {
-                              const payload = {
-                                ...form,
-                                area: tree?.area?.id
-                                  ? { id: tree.area.id }
-                                  : undefined,
-                              };
-
-                              createMutation.mutate(payload);
-                            }}
-                          >
-                            <Save className="w-4 h-4 text-green-600" />
-                          </Button>
-
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => {
-                              setNewRow(false);
-                              setForm({});
-                            }}
-                          >
-                            <X className="w-4 h-4 text-gray-500" />
-                          </Button>
-                        </td>
+                <div className="border rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-left">
+                      <tr>
+                        <th className="p-3">Nome</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3">Tipo</th>
+                        <th className="p-3">Prioridade</th>
+                        <th className="p-3 w-10"></th>
                       </tr>
-                    )}
+                    </thead>
 
-                    {flatTree.map((node) => (
-                      <tr key={node.id} className="border-t">
-                        <td
-                          className="p-2 font-medium"
-                          style={{ paddingLeft: `${node.level * 20}px` }}
+                    <tbody>
+
+                      {newRow && (
+                        <tr className="border-t bg-muted/30">
+                          <td className="p-3">
+                            <Input
+                              value={form.name || ""}
+                              onChange={(e) =>
+                                setForm({ ...form, name: e.target.value })
+                              }
+                              placeholder="Nome do subprocesso"
+                              className="h-8 text-sm"
+                            />
+                          </td>
+
+                          <td className="p-3">
+                            <select
+                              value={form.status}
+                              onChange={(e) =>
+                                setForm({ ...form, status: e.target.value })
+                              }
+                              className="h-8 text-xs border rounded px-2 bg-background w-full"
+                            >
+                              <option value="ACTIVE">ACTIVE</option>
+                              <option value="IN_REVIEW">IN_REVIEW</option>
+                              <option value="CRITICAL">CRITICAL</option>
+                            </select>
+                          </td>
+
+                          <td className="p-3">
+                            <select
+                              value={form.type}
+                              onChange={(e) =>
+                                setForm({ ...form, type: e.target.value })
+                              }
+                              className="h-8 text-xs border rounded px-2 bg-background w-full"
+                            >
+                              <option value="MANUAL">MANUAL</option>
+                              <option value="SYSTEM">SYSTEM</option>
+                            </select>
+                          </td>
+
+                          <td className="p-3">
+                            <select
+                              value={form.priority}
+                              onChange={(e) =>
+                                setForm({ ...form, priority: e.target.value })
+                              }
+                              className="h-8 text-xs border rounded px-2 bg-background w-full"
+                            >
+                              <option value="LOW">LOW</option>
+                              <option value="MEDIUM">MEDIUM</option>
+                              <option value="HIGH">HIGH</option>
+                            </select>
+                          </td>
+
+                          <td className="p-3 flex gap-1">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => {
+                                const payload = {
+                                  ...form,
+                                  area: tree?.area?.id
+                                    ? { id: tree.area.id }
+                                    : undefined,
+                                };
+                                createMutation.mutate(payload);
+                              }}
+                            >
+                              <Save className="w-4 h-4 text-green-600" />
+                            </Button>
+
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => {
+                                setNewRow(false);
+                                setForm({});
+                              }}
+                            >
+                              <X className="w-4 h-4 text-gray-500" />
+                            </Button>
+                          </td>
+                        </tr>
+                      )}
+
+                      {!newRow && flatTree.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="p-10 text-center">
+                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                              <div className="text-sm font-medium">
+                                Nenhum subprocesso ainda
+                              </div>
+                              <div className="text-xs">
+                                Clique em "Subprocesso" para adicionar o primeiro.
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+
+                      {flatTree.map((node) => (
+                        <tr key={node.id} className="border-t">
+                          <td
+                            className="p-3 font-medium"
+                            style={{ paddingLeft: `${12 + node.level * 20}px` }}
+                          >
+                            {node.name}
+                          </td>
+
+                          <td className="p-3">
+                            <Badge value={node.status} map={statusMap} />
+                          </td>
+
+                          <td className="p-3">
+                            <Badge value={node.type} map={typeMap} />
+                          </td>
+
+                          <td className="p-3">
+                            <Badge value={node.priority} map={priorityMap} />
+                          </td>
+
+                          <td className="p-3">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => deleteMutation.mutate(node.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* ================= INFORMAÇÕES ================= */}
+            {tree && (
+              <div className="space-y-6 border-t pt-8">
+
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                  Informações do Processo
+                </h3>
+
+                <div className="grid grid-cols-2 gap-x-10 gap-y-8 text-sm">
+
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Área</div>
+                    <div className="font-medium">{tree.area?.name || "-"}</div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Status</div>
+                    <Badge value={tree.status} map={statusMap} />
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Tipo</div>
+                    <Badge value={tree.type} map={typeMap} />
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-muted-foreground mb-1">Prioridade</div>
+                    <Badge value={tree.priority} map={priorityMap} />
+                  </div>
+
+                </div>
+
+                <div>
+                  <div className="text-xs text-muted-foreground mb-2">Descrição</div>
+                  <div className="bg-muted/40 rounded-lg p-5 text-sm leading-relaxed">
+                    {tree.description || "Sem descrição"}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-xs text-muted-foreground mb-2">Ferramentas</div>
+                  <div className="flex flex-wrap gap-2">
+                    {tree.tools?.length
+                      ? tree.tools.map((tool: any) => (
+                        <span
+                          key={tool.id}
+                          className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
                         >
-                          {node.name}
-                        </td>
+                          {tool.title}
+                        </span>
+                      ))
+                      : <span className="text-xs text-muted-foreground">Nenhuma ferramenta vinculada</span>}
+                  </div>
+                </div>
 
-                        <td className="p-2">
-                          <Badge value={node.status} map={statusMap} />
-                        </td>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-2">Responsáveis</div>
+                  <div className="flex flex-wrap gap-2">
+                    {tree.responsiblePeople?.length
+                      ? tree.responsiblePeople.map((person: any) => (
+                        <span
+                          key={person.id}
+                          className="px-3 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-full"
+                        >
+                          {person.name}
+                        </span>
+                      ))
+                      : <span className="text-xs text-muted-foreground">Nenhum responsável</span>}
+                  </div>
+                </div>
 
-                        <td className="p-2">
-                          <Badge value={node.type} map={typeMap} />
-                        </td>
+                <div>
+                  <div className="text-xs text-muted-foreground mb-2">Documentos</div>
+                  <div className="flex flex-wrap gap-2">
+                    {tree.documents?.length
+                      ? tree.documents.map((doc: any) => (
+                        <span
+                          key={doc.id}
+                          className="px-3 py-1 text-xs bg-amber-100 text-amber-700 rounded-full"
+                        >
+                          {doc.title}
+                        </span>
+                      ))
+                      : <span className="text-xs text-muted-foreground">Nenhum documento vinculado</span>}
+                  </div>
+                </div>
 
-                        <td className="p-2">
-                          <Badge value={node.priority} map={priorityMap} />
-                        </td>
-
-                        <td className="p-2">
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => deleteMutation.mutate(node.id)}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
               </div>
             )}
 
@@ -415,10 +529,10 @@ export default function Processes() {
         </div>
 
         {/* RIGHT */}
-        <div className="col-span-3 crud-panel flex flex-col">
-          <div className="panel-header">Processo Raiz</div>
+        <div className="col-span-3 crud-panel flex flex-col h-full overflow-hidden">
+          <div className="panel-header shrink-0">Processo Raiz</div>
 
-          <div className="p-4 space-y-3">
+          <div className="p-4 space-y-3 flex-1 overflow-y-auto">
             <Button
               className="w-full justify-start"
               onClick={() =>
