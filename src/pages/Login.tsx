@@ -24,7 +24,7 @@ export default function Login() {
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: 'admin@erp.com', password: 'admin' },
+    // defaultValues: { email: 'admin@erp.com', password: 'admin' },
   });
 
   const onSubmit = async (data: LoginForm) => {
@@ -54,7 +54,7 @@ export default function Login() {
           </div>
           <h1 className="text-4xl font-bold text-primary-foreground mb-4">ERP Manager</h1>
           <p className="text-primary-foreground/70 text-lg max-w-md">
-            Sistema de gestão de processos corporativo. Gerencie áreas, ferramentas, pessoas e documentos.
+            Sistema de gestão de processos corporativos. Gerencie áreas, ferramentas, pessoas e documentos.
           </p>
         </div>
       </div>
@@ -76,7 +76,6 @@ export default function Login() {
                   id="email"
                   type="email"
                   className="pl-10"
-                  placeholder="admin@erp.com"
                   {...register('email')}
                 />
               </div>
@@ -91,7 +90,6 @@ export default function Login() {
                   id="password"
                   type="password"
                   className="pl-10"
-                  placeholder="••••••"
                   {...register('password')}
                 />
               </div>
@@ -115,10 +113,6 @@ export default function Login() {
               )}
             </Button>
           </form>
-
-          <p className="text-xs text-muted-foreground text-center mt-8">
-            Demo: qualquer credencial funciona
-          </p>
         </div>
       </div>
     </div>

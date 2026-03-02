@@ -20,7 +20,8 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 &&
+      window.location.pathname !== '/login') {
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -34,7 +35,7 @@ export default api;
 // API functions
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post('/auth/login', { email, password }),
+    api.post('/auth', { email, password }),
 };
 
 export const areasApi = {
@@ -69,11 +70,11 @@ export const documentsApi = {
   delete: (id: string) => api.delete(`/documents/${id}`),
 };
 
-export const processesApi = {
-  getAll: () => api.get('/processes'),
-  getTree: () => api.get('/processes/tree'),
-  getOne: (id: string) => api.get(`/processes/${id}`),
-  create: (data: any) => api.post('/processes', data),
-  update: (id: string, data: any) => api.patch(`/processes/${id}`, data),
-  delete: (id: string) => api.delete(`/processes/${id}`),
+export const processApi = {
+  getAll: () => api.get('/process'),
+  getTree: (id:string) => api.get(`/process/${id}/tree`),
+  getOne: (id: string) => api.get(`/process/${id}`),
+  create: (data: any) => api.post('/process', data),
+  update: (id: string, data: any) => api.patch(`/process/${id}`, data),
+  delete: (id: string) => api.delete(`/process/${id}`),
 };

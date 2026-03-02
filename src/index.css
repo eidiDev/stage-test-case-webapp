@@ -161,7 +161,7 @@
   }
 
   .crud-panel {
-    @apply bg-card rounded-lg border border-border overflow-hidden;
+    @apply bg-card rounded-lg border border-border;
     box-shadow: var(--shadow-card);
   }
 

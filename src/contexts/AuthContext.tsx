@@ -33,18 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    try {
-      const { data } = await authApi.login(email, password);
-      localStorage.setItem('access_token', data.access_token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-    } catch {
-      // Fallback: mock login for demo
-      const token = 'mock-jwt-token';
-      localStorage.setItem('access_token', token);
-      localStorage.setItem('user', JSON.stringify(MOCK_USER));
-      setUser(MOCK_USER);
-    }
+    const { data } = await authApi.login(email, password);
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    setUser(data.user);
   }, []);
 
   const logout = useCallback(() => {
