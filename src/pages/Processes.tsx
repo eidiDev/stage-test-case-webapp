@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Search, Plus, Save, Trash2, X, Pencil } from "lucide-react";
+import ProcessView  from "@/components/processes_ui/processView";
+import ProcessEditForm from "@/components/processes_ui/processEditForm";
 
 interface ProcessNode {
   id: string;
@@ -28,7 +30,18 @@ export default function Processes() {
   const [newRow, setNewRow] = useState(false);
   const [form, setForm] = useState<any>({});
 
-  const [processForm, setProcessForm] = useState<any>(null);
+  // const [processForm, setProcessForm] = useState<any>(null);
+  const [processForm, setProcessForm] = useState({
+    name: "",
+    description: "",
+    type: "",
+    status: "",
+    priority: "",
+    tools: [] as string[],
+    responsiblePeople: [] as string[],
+    documents: [] as string[],
+  });
+  const [editingProcess, setEditingProcess] = useState(false);
 
   // ------------------- QUERIES -------------------
 
@@ -57,7 +70,6 @@ export default function Processes() {
         type: tree.type,
         status: tree.status,
         priority: tree.priority,
-        area: tree.area?.id || "",
         tools: tree.tools?.map((t: any) => t.id) || [],
         responsiblePeople: tree.responsiblePeople?.map((p: any) => p.id) || [],
         documents: tree.documents?.map((d: any) => d.id) || [],
@@ -443,85 +455,41 @@ export default function Processes() {
                   Informações do Processo
                 </h3>
 
-                <div className="grid grid-cols-2 gap-x-10 gap-y-8 text-sm">
+                {!editingProcess ? (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setProcessForm({
+                        name: tree.name ?? "",
+                        description: tree.description ?? "",
+                        type: tree.type ?? "",
+                        status: tree.status ?? "",
+                        priority: tree.priority ?? "",
+                        tools: tree.tools?.map((t: any) => t.id) ?? [],
+                        responsiblePeople:
+                          tree.responsiblePeople?.map((r: any) => r.id) ?? [],
+                        documents: tree.documents?.map((d: any) => d.id) ?? [],
+                      });
 
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Área</div>
-                    <div className="font-medium">{tree.area?.name || "-"}</div>
-                  </div>
+                      setEditingProcess(true);
+                    }}
+                  >
+                    Editar
+                  </Button>
+                ) : null}
 
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Status</div>
-                    <Badge value={tree.status} map={statusMap} />
-                  </div>
-
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Tipo</div>
-                    <Badge value={tree.type} map={typeMap} />
-                  </div>
-
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Prioridade</div>
-                    <Badge value={tree.priority} map={priorityMap} />
-                  </div>
-
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2">Descrição</div>
-                  <div className="bg-muted/40 rounded-lg p-5 text-sm leading-relaxed">
-                    {tree.description || "Sem descrição"}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2">Ferramentas</div>
-                  <div className="flex flex-wrap gap-2">
-                    {tree.tools?.length
-                      ? tree.tools.map((tool: any) => (
-                        <span
-                          key={tool.id}
-                          className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
-                        >
-                          {tool.title}
-                        </span>
-                      ))
-                      : <span className="text-xs text-muted-foreground">Nenhuma ferramenta vinculada</span>}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2">Responsáveis</div>
-                  <div className="flex flex-wrap gap-2">
-                    {tree.responsiblePeople?.length
-                      ? tree.responsiblePeople.map((person: any) => (
-                        <span
-                          key={person.id}
-                          className="px-3 py-1 text-xs bg-emerald-100 text-emerald-700 rounded-full"
-                        >
-                          {person.name}
-                        </span>
-                      ))
-                      : <span className="text-xs text-muted-foreground">Nenhum responsável</span>}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2">Documentos</div>
-                  <div className="flex flex-wrap gap-2">
-                    {tree.documents?.length
-                      ? tree.documents.map((doc: any) => (
-                        <span
-                          key={doc.id}
-                          className="px-3 py-1 text-xs bg-amber-100 text-amber-700 rounded-full"
-                        >
-                          {doc.title}
-                        </span>
-                      ))
-                      : <span className="text-xs text-muted-foreground">Nenhum documento vinculado</span>}
-                  </div>
-                </div>
-
+                {!editingProcess ? (
+                  <ProcessView tree={tree} />
+                ) : (
+                  <ProcessEditForm
+                    tree={tree}
+                    processForm={processForm}
+                    setProcessForm={setProcessForm}
+                    setEditingProcess={setEditingProcess}
+                    updateRootMutation={updateRootMutation}
+                  />
+                )}
               </div>
             )}
 

@@ -48,6 +48,8 @@ export const areasApi = {
 
 export const toolsApi = {
   getAll: () => api.get('/tools'),
+  getAllFilter: (param: any) =>
+    api.get("/tools", { params: param?.filter ? { filter: param.filter } : {} }),
   getOne: (id: string) => api.get(`/tools/${id}`),
   create: (data: any) => api.post('/tools', data),
   update: (id: string, data: any) => api.patch(`/tools/${id}`, data),
@@ -56,6 +58,8 @@ export const toolsApi = {
 
 export const peopleApi = {
   getAll: () => api.get('/people'),
+  getAllFilter: (param: any) =>
+    api.get("/people", { params: param?.filter ? { filter: param.filter } : {} }),
   getOne: (id: string) => api.get(`/people/${id}`),
   create: (data: any) => api.post('/people', data),
   update: (id: string, data: any) => api.patch(`/people/${id}`, data),
@@ -64,6 +68,8 @@ export const peopleApi = {
 
 export const documentsApi = {
   getAll: () => api.get('/documents'),
+  getAllFilter: (param: any) =>
+    api.get("/documents", { params: param?.filter ? { filter: param.filter } : {} }),
   getOne: (id: string) => api.get(`/documents/${id}`),
   create: (data: any) => api.post('/documents', data),
   update: (id: string, data: any) => api.patch(`/documents/${id}`, data),
@@ -72,7 +78,7 @@ export const documentsApi = {
 
 export const processApi = {
   getAll: () => api.get('/process'),
-  getTree: (id:string) => api.get(`/process/${id}/tree`),
+  getTree: (id: string) => api.get(`/process/${id}/tree`),
   getOne: (id: string) => api.get(`/process/${id}`),
   create: (data: any) => api.post('/process', data),
   update: (id: string, data: any) => api.patch(`/process/${id}`, data),
