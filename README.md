@@ -1,73 +1,158 @@
-# Welcome to your Lovable project
+# Stage Case Test Front
 
-## Project info
+Front-end da aplicação **Stage Case Test**, desenvolvido para atender o cenário de **gestão de processos empresariais**.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Este projeto fornece interface web com:
+- **Login com JWT**
+- **Logout**
+- **Dashboard**
+- Páginas com **CRUD** de:
+  - Áreas
+  - Ferramentas
+  - Pessoas
+  - Documentos
+  - Processos
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Stack
 
-**Use Lovable**
+Principais tecnologias utilizadas (conforme `package.json`):
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Vite** (build e dev server)
+- **React 18** + **TypeScript**
+- **React Router DOM** (roteamento)
+- **@tanstack/react-query** (cache e gerenciamento de requests)
+- **Axios** (HTTP client)
+- **TailwindCSS** + **shadcn/ui** + **Radix UI** (UI e componentes)
+- **React Hook Form** + **Zod** (formulários e validação)
+- **Vitest** + Testing Library (testes)
+- **ESLint** (lint)
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## Funcionalidades
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Autenticação
+- **Login JWT**: autentica via API e armazena o token para as chamadas autenticadas.
+- **Logout**: remove o token/sessão e redireciona para a tela de login.
+- **Rotas protegidas**: páginas internas exigem autenticação.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Módulos (CRUD)
+- **Áreas**: listagem, criação, edição e remoção.
+- **Ferramentas**: listagem, criação, edição e remoção.
+- **Pessoas**: listagem, criação, edição e remoção.
+- **Documentos**: listagem, criação, edição e remoção.
+- **Processos**: listagem, criação, edição e remoção.
 
-Follow these steps:
+### Dashboard
+- Página inicial pós-login (visão geral do sistema).
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## Requisitos
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Node.js** (recomendado 18+)
+- **npm** (ou yarn/pnpm, se preferir)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+---
+
+## Instalação
+
+1. Clone o repositório:
+
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd <PASTA_DO_PROJETO>
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Configure as variáveis de ambiente (crie um .env na raiz do projeto):
+
+```bash
+VITE_API_URL=http://localhost:3000
+```
+
+Ajuste a URL conforme a API do backend.
+
+## Executando o projeto
+### Ambiente de desenvolvimento
+
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+A aplicação ficará disponível normalmente em:
+http://localhost:5173
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+#### Build de produção
+```bash
+npm run build
+```
 
-**Use GitHub Codespaces**
+### Build em modo development
+```bash
+npm run build:dev
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Preview do build
+```bash
+npm run preview
+```
 
-## What technologies are used for this project?
+## Scripts disponíveis
 
-This project is built with:
+```bash
+npm run dev — inicia o Vite em modo desenvolvimento
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+npm run build — gera build de produção
 
-## How can I deploy this project?
+npm run build:dev — gera build em modo development
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+npm run preview — serve localmente o build gerado
 
-## Can I connect a custom domain to my Lovable project?
+npm run lint — executa ESLint
 
-Yes, you can!
+npm run test — executa testes (Vitest)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+npm run test:watch — executa testes em modo watch
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Integração com a API
+
+Este front consome a API através da variável de ambiente:
+
+VITE_API_URL — URL base da API
+
+As requisições autenticadas utilizam:
+
+Authorization: Bearer <TOKEN>
+
+## 👨‍💻 Autor
+
+Lucas Eidi  
+📧 lucaseidikumagai@gmail.com
+
+---
+
+## ℹ️ Observação sobre desenvolvimento
+
+A estrutura inicial do projeto foi gerada com auxílio da ferramenta Lovable, 
+sendo posteriormente adaptada e evoluída manualmente.
+
+Foram implementadas customizações como:
+
+- Integração completa com API backend (NestJS + PostgreSQL)
+- Implementação de autenticação JWT
+- Ajustes de regras de negócio
+- Estruturação de rotas protegidas
+- Integração com React Query
+- Refatorações e organização de código
+
+GitHub:  
+https://github.com/eidiDev
