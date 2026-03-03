@@ -40,6 +40,8 @@ export const authApi = {
 
 export const areasApi = {
   getAll: () => api.get('/areas'),
+  getAllFilter: (param: any) =>
+    api.get("/areas", { params: param?.filter ? { filter: param.filter } : {} }),
   getOne: (id: string) => api.get(`/areas/${id}`),
   create: (data: any) => api.post('/areas', data),
   update: (id: string, data: any) => api.patch(`/areas/${id}`, data),
