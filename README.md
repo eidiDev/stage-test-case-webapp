@@ -138,6 +138,9 @@ Authorization: Bearer <TOKEN>
 Lucas Eidi  
 📧 lucaseidikumagai@gmail.com
 
+GitHub:  
+https://github.com/eidiDev
+
 ---
 
 ## ℹ️ Observação sobre desenvolvimento
@@ -153,6 +156,3 @@ Foram implementadas customizações como:
 - Estruturação de rotas protegidas
 - Integração com React Query
 - Refatorações e organização de código
-
-GitHub:  
-https://github.com/eidiDev
