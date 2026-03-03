@@ -86,3 +86,7 @@ export const processApi = {
   update: (id: string, data: any) => api.patch(`/process/${id}`, data),
   delete: (id: string) => api.delete(`/process/${id}`),
 };
+
+export const dashboardApi = {
+  getOverview: () => api.get('/dashboard/overview'),
+};

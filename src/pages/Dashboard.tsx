@@ -1,34 +1,59 @@
 import {
   GitBranch, MapPin, Users, FileText, AlertTriangle, CheckCircle,
   Settings, UserCheck,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
-} from 'recharts';
+} from "recharts";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi } from "@/services/api";
 
-const metrics = [
-  { label: 'Processos', value: 47, icon: GitBranch, color: 'text-primary' },
-  { label: 'Ativos', value: 32, icon: CheckCircle, color: 'text-status-active' },
-  { label: 'Críticos', value: 5, icon: AlertTriangle, color: 'text-status-critical' },
-  { label: 'Áreas', value: 8, icon: MapPin, color: 'text-primary' },
-  { label: 'Pessoas', value: 24, icon: Users, color: 'text-primary' },
-  { label: 'Documentos', value: 63, icon: FileText, color: 'text-primary' },
-];
+const STATUS_LABEL: Record<string, string> = {
+  ACTIVE: "Ativo",
+  IN_REVIEW: "Em Revisão",
+  CRITICAL: "Crítico",
+};
 
-const statusData = [
-  { name: 'Ativo', value: 32, color: 'hsl(142, 71%, 45%)' },
-  { name: 'Em Revisão', value: 10, color: 'hsl(38, 92%, 50%)' },
-  { name: 'Crítico', value: 5, color: 'hsl(0, 84%, 60%)' },
-];
-
-const priorityData = [
-  { name: 'Alta', system: 8, manual: 5 },
-  { name: 'Média', system: 12, manual: 9 },
-  { name: 'Baixa', system: 7, manual: 6 },
-];
+const STATUS_COLOR: Record<string, string> = {
+  ACTIVE: "hsl(142, 71%, 45%)",
+  IN_REVIEW: "hsl(38, 92%, 50%)",
+  CRITICAL: "hsl(0, 84%, 60%)",
+};
 
 export default function Dashboard() {
+  const overviewQuery = useQuery({
+    queryKey: ["dashboard-overview"],
+    queryFn: async () => {
+      const res = await dashboardApi.getOverview();
+      return res.data;
+    },
+    staleTime: 60 * 1000,
+  });
+
+  const data = overviewQuery.data;
+
+  const metrics = [
+    { label: "Processos", value: data?.metrics?.processes ?? 0, icon: GitBranch, color: "text-primary" },
+    { label: "Ativos", value: data?.metrics?.status?.ACTIVE ?? 0, icon: CheckCircle, color: "text-status-active" },
+    { label: "Críticos", value: data?.metrics?.status?.CRITICAL ?? 0, icon: AlertTriangle, color: "text-status-critical" },
+    { label: "Áreas", value: data?.metrics?.areas ?? 0, icon: MapPin, color: "text-primary" },
+    { label: "Pessoas", value: data?.metrics?.people ?? 0, icon: Users, color: "text-primary" },
+    { label: "Documentos", value: data?.metrics?.documents ?? 0, icon: FileText, color: "text-primary" },
+  ];
+
+  const statusData = (["ACTIVE", "IN_REVIEW", "CRITICAL"] as const).map((k) => ({
+    name: STATUS_LABEL[k],
+    value: data?.metrics?.status?.[k] ?? 0,
+    color: STATUS_COLOR[k],
+  }));
+
+  const priorityData = (["HIGH", "MEDIUM", "LOW"] as const).map((p) => ({
+    name: p === "HIGH" ? "Alta" : p === "MEDIUM" ? "Média" : "Baixa",
+    system: data?.priorityByType?.[p]?.SYSTEM ?? 0,
+    manual: data?.priorityByType?.[p]?.MANUAL ?? 0,
+  }));
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
@@ -43,7 +68,9 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-3">
               <m.icon className={`w-5 h-5 ${m.color}`} />
             </div>
-            <p className="text-2xl font-bold text-foreground">{m.value}</p>
+            <p className="text-2xl font-bold text-foreground">
+              {overviewQuery.isLoading ? "—" : m.value}
+            </p>
             <p className="text-xs text-muted-foreground mt-1">{m.label}</p>
           </div>
         ))}
@@ -56,7 +83,15 @@ export default function Dashboard() {
           <h3 className="font-semibold text-foreground mb-4">Processos por Status</h3>
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={statusData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" paddingAngle={4}>
+              <Pie
+                data={statusData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                dataKey="value"
+                paddingAngle={4}
+              >
                 {statusData.map((entry, i) => (
                   <Cell key={i} fill={entry.color} />
                 ))}
